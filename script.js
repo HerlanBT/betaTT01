@@ -235,45 +235,55 @@ function exportCoursePDF(course, rows) {
 
 
 
-    function exportAllPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-      let first = true;
+  function exportAllPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
 
-      state.courses.forEach(course => {
-        const rows = state.grouped[course];
+  const img = new Image();
+  img.src = "logo-colegio.png"; // ruta de tu logo
 
-        if (!first) doc.addPage();
-        first = false;
+  img.onload = function () {
+    let first = true;
 
-        // Encabezado con solo las columnas que quieres exportar
-        const head = [state.columns.filter(c => pdfColumns.includes(c.key)).map(c => c.label)];
+    state.courses.forEach(course => {
+      const rows = state.grouped[course];
 
-        // Filtrar solo filas que tengan exportar !== false
-        const rowsToExport = rows.filter(r => r.exportar !== false);
+      if (!first) doc.addPage();
+      first = false;
 
-        // Body del PDF con ID consecutivo
-        const body = rowsToExport.map((r, i) =>
-          pdfColumns.map(k => k === "id" ? i + 1 : r[k] ?? '')
-        );
+      // Poner logo en la esquina superior derecha de cada página
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.addImage(img, "PNG", pageWidth - 100, 20, 60, 60);
 
-        doc.setFontSize(12);
-        doc.text(`Curso: ${course}  —  Registros: ${rowsToExport.length} - Notas Computacion 2025`, 40, 40);
+      // Encabezado y tabla
+      const head = [state.columns.filter(c => pdfColumns.includes(c.key)).map(c => c.label)];
+      const rowsToExport = rows.filter(r => r.exportar !== false);
+      const body = rowsToExport.map((r, i) =>
+        pdfColumns.map(k => k === "id" ? i + 1 : r[k] ?? '')
+      );
 
-        doc.autoTable({
-          startY: 60,
-          head: head,
-          body: body,
-          styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
-          headStyles: { fillColor: [30, 41, 59] },
-          alternateRowStyles: { fillColor: [245, 247, 250] },
-          theme: 'striped',
-          margin: { left: 40, right: 40 }
-        });
+      doc.setFontSize(12);
+      doc.text(`Curso: ${course}  —  Registros: ${rowsToExport.length} - Notas Computacion 2025`, 40, 40);
+
+      doc.autoTable({
+        startY: 100, // dejamos espacio para el logo
+        head: head,
+        body: body,
+        styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+        headStyles: { fillColor: [30, 41, 59] },
+        alternateRowStyles: { fillColor: [245, 247, 250] },
+        theme: 'striped',
+        margin: { left: 40, right: 40 }
       });
+    });
 
-      doc.save('Listado_por_curso.pdf');
-    }
+    doc.save('Listado_por_curso.pdf');
+  };
+
+  img.onerror = function () {
+    alert("No se pudo cargar el logo. Revisa la ruta (logo-colegio.png).");
+  };
+}
 
     function sanitize(s) {
       return String(s).replace(/[^\w\-\u00C0-\u024F\s]/g, '').replace(/\s+/g, '_');
