@@ -129,34 +129,32 @@
         container.appendChild(details);
       });
     }
-    function calcularNotas(table) {
-      const tbody = table.querySelector("tbody");
+function calcularNotas(table) {
+  const tbody = table.querySelector("tbody");
 
-      // índices de columnas que vamos a usar
-      const colExamen = getColIndex("notaexamen");
-      const colTrim1 = getColIndex("notaprimertrimestre");
-      const colTrim2 = getColIndex("notasegundotrimestre");
-      const colTrim3 = getColIndex("notatercertrimestre");
-      const colFinal = getColIndex("notafinal");
+  const colTrim1 = getColIndex("notaprimertrimestre");
+  const colTrim2 = getColIndex("notasegundotrimestre");
+  const colTrim3 = getColIndex("notatercertrimestre");
+  const colFinal = getColIndex("notafinal");
 
-      if ([colTrim1, colTrim2, colTrim3, colFinal].includes(-1)) {
-        alert("Faltan columnas en state.columns");
-        return;
-      }
+  tbody.querySelectorAll("tr").forEach(row => {
+    const id = row.children[getColIndex("id")].innerText;
+    const record = state.data.find(r => String(r.id) === String(id));
 
-      tbody.querySelectorAll("tr").forEach(row => {
+    const t1 = parseFloat(row.children[colTrim1]?.innerText) || 0;
+    const t2 = parseFloat(row.children[colTrim2]?.innerText) || 0;
+    const t3 = parseFloat(row.children[colTrim3]?.innerText) || 0;
 
-        const t1 = parseFloat(row.children[colTrim1]?.innerText) || 0;
-        const t2 = parseFloat(row.children[colTrim2]?.innerText) || 0;
-        const t3 = parseFloat(row.children[colTrim3]?.innerText) || 0;
+    const notaFinal = (t1 + t2 + t3) / 3;
 
-        // 👇 Aquí defines tu fórmula real para nota final
-        const notaFinal = (t1 + t2 + t3) / 3;
+    row.children[colFinal].innerText = notaFinal.toFixed(2);
 
-         row.children[colFinal].innerText = notaFinal.toFixed(2);
-    if (record) record.notafinal = parseFloat(notaFinal.toFixed(2));
-  });
+    if (record) {
+      record.notafinal = parseFloat(notaFinal.toFixed(2));
     }
+  });
+}
+
 
     function getColIndex(key) {
       return state.columns.findIndex(c => c.key === key);
@@ -235,8 +233,7 @@ function exportCoursePDF(course, rows) {
 
 
 
-
-  function exportAllPDF() {
+function exportAllPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
 
@@ -248,6 +245,14 @@ function exportCoursePDF(course, rows) {
 
     state.courses.forEach(course => {
       const rows = state.grouped[course];
+
+      // 🔹 Recalcular nota final antes de exportar
+      rows.forEach(r => {
+        const t1 = parseFloat(r.notaprimertrimestre) || 0;
+        const t2 = parseFloat(r.notasegundotrimestre) || 0;
+        const t3 = parseFloat(r.notatercertrimestre) || 0;
+        r.notafinal = parseFloat(((t1 + t2 + t3) / 3).toFixed(2));
+      });
 
       if (!first) doc.addPage();
       first = false;
@@ -285,6 +290,7 @@ function exportCoursePDF(course, rows) {
     alert("No se pudo cargar el logo. Revisa la ruta (logo-colegio.png).");
   };
 }
+
 
     function sanitize(s) {
       return String(s).replace(/[^\w\-\u00C0-\u024F\s]/g, '').replace(/\s+/g, '_');
