@@ -153,8 +153,9 @@
         // 👇 Aquí defines tu fórmula real para nota final
         const notaFinal = (t1 + t2 + t3) / 3;
 
-        row.children[colFinal].innerText = notaFinal.toFixed(2);
-      });
+         row.children[colFinal].innerText = notaFinal.toFixed(2);
+    if (record) record.notafinal = parseFloat(notaFinal.toFixed(2));
+  });
     }
 
     function getColIndex(key) {
