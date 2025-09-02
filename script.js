@@ -1,3 +1,6 @@
+      const img = new Image();
+      img.src = "logo-colegio.png";  // si está en la misma carpeta que script.js y el html
+
  const state = {
       data: [], grouped: {}, courses: [], columns: [
         { key: 'id', label: 'ID' },
@@ -183,42 +186,53 @@
     ];
 
     // PDF helpers
-    function exportCoursePDF(course, rows) {
-      if (!rows || !rows.length) {
-        alert('No hay datos para exportar.');
-        return;
-      }
+function exportCoursePDF(course, rows) {
+  if (!rows || !rows.length) {
+    alert('No hay datos para exportar.');
+    return;
+  }
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
 
-      // Encabezado solo con las columnas que quieres
-      const head = [state.columns.filter(c => pdfColumns.includes(c.key)).map(c => c.label)];
+  const img = new Image();
+  img.src = "logo-colegio.png"; // debe estar en la misma carpeta que tu index.html
 
-      // Filtrar solo filas que estén marcadas para exportar
-      const rowsToExport = rows.filter(r => r.exportar !== false);
+  img.onload = function () {
+    // Agregamos logo (ejemplo: esquina superior derecha)
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.addImage(img, "PNG", pageWidth - 100, 20, 60, 60);
 
-      // Generar el body del PDF
-      const body = rowsToExport.map((r, i) =>
-        pdfColumns.map(k => k === "id" ? i + 1 : r[k] ?? '')
-      );
+    // Encabezado
+    const head = [state.columns.filter(c => pdfColumns.includes(c.key)).map(c => c.label)];
+    const rowsToExport = rows.filter(r => r.exportar !== false);
+    const body = rowsToExport.map((r, i) =>
+      pdfColumns.map(k => k === "id" ? i + 1 : r[k] ?? '')
+    );
 
-      doc.setFontSize(12);
-      doc.text(`Curso: ${course}  —  Registros: ${rowsToExport.length}`, 40, 40);
+    doc.setFontSize(12);
+    doc.text(`Curso: ${course}  —  Registros: ${rowsToExport.length}`, 40, 40);
 
-      doc.autoTable({
-        startY: 60,
-        head: head,
-        body: body,
-        styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
-        headStyles: { fillColor: [30, 41, 59] },
-        alternateRowStyles: { fillColor: [245, 247, 250] },
-        theme: 'striped',
-        margin: { left: 40, right: 40 }
-      });
+    doc.autoTable({
+      startY: 100, // dejamos espacio para el logo
+      head: head,
+      body: body,
+      styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+      headStyles: { fillColor: [30, 41, 59] },
+      alternateRowStyles: { fillColor: [245, 247, 250] },
+      theme: 'striped',
+      margin: { left: 40, right: 40 }
+    });
 
-      doc.save(`Listado_${sanitize(course)}.pdf`);
-    }
+    doc.save(`Listado_${sanitize(course)}.pdf`);
+  };
+
+  img.onerror = function () {
+    alert("No se pudo cargar el logo. Revisa la ruta (logo-colegio.png).");
+  };
+}
+
+
 
 
     function exportAllPDF() {

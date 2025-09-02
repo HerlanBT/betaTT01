@@ -3523,7 +3523,7 @@
     "notaexamen": 0,
     "notafinal": 45,
     "notaprimertrimestre": 75,
-    "notasegundotrimestre": 60,
+    "notasegundotrimestre": 80,
     "notatercertrimestre": 0,
     "exportar": null
   },
@@ -3537,7 +3537,7 @@
     "notaexamen": 0,
     "notafinal": 45,
     "notaprimertrimestre": 75,
-    "notasegundotrimestre": 60,
+    "notasegundotrimestre": 75,
     "notatercertrimestre": 0,
     "exportar": null
   },
@@ -3733,7 +3733,7 @@
     "notaexamen": 0,
     "notafinal": 0,
     "notaprimertrimestre": 62,
-    "notasegundotrimestre": 90,
+    "notasegundotrimestre": 80,
     "notatercertrimestre": 0,
     "exportar": null
   },
@@ -3747,7 +3747,7 @@
     "notaexamen": 0,
     "notafinal": 63,
     "notaprimertrimestre": 100,
-    "notasegundotrimestre": 90,
+    "notasegundotrimestre": 100,
     "notatercertrimestre": 0,
     "exportar": null
   },
@@ -4363,7 +4363,7 @@
     "notaexamen": 0,
     "notafinal": 0,
     "notaprimertrimestre": 91,
-    "notasegundotrimestre": 67,
+    "notasegundotrimestre": 50,
     "notatercertrimestre": 0,
     "exportar": null
   },
